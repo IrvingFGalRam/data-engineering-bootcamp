@@ -1,1 +1,7 @@
+# Local IntelliJ directories
+.idea/
+
+# Local .venv directories
+**/.venv/*
+
 .DS_Store

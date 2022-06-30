@@ -1,6 +1,8 @@
 
 # Table of Contents
 
+Currently working on GCP dir, refer to that [folder readme](https://github.com/IrvingFGalRam/data-engineering-bootcamp/blob/main/terraforms-templates/gcp/README.md)) for steps
+
 1.  [Contains of this repo](#orgd498d9b)
 2.  [Terraform K8s Cluster](#org345164b)
     1.  [Terraform AWS-EKS](#org7565b64)
