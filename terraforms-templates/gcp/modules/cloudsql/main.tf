@@ -1,3 +1,28 @@
+# Storage Bucket and Data
+resource "google_storage_bucket" "input_bucket" {
+  name     = "${var.project_id}-input"
+  location = var.region
+}
+
+resource "google_storage_bucket_object" "data_1" {
+  name   = var.data_1_name
+  source = var.data_1_path
+  bucket = google_storage_bucket.input_bucket.name
+}
+
+resource "google_storage_bucket_object" "data_2" {
+  name   = var.data_2_name
+  source = var.data_2_path
+  bucket = google_storage_bucket.input_bucket.name
+}
+
+resource "google_storage_bucket_object" "data_3" {
+  name   = var.data_3_name
+  source = var.data_3_path
+  bucket = google_storage_bucket.input_bucket.name
+}
+
+# DB
 resource "google_sql_database_instance" "sql_instance" {
   name              = var.instance_name
   database_version  = var.database_version

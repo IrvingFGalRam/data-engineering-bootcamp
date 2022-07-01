@@ -55,3 +55,21 @@ variable "db_password" {
   description = "Password credentials for root user"
   default     = "dbpassword"
 }
+variable "data_1_path" {
+  description = "Path for the file 1"
+}
+variable "data_2_path" {
+  description = "Path for the file 2"
+}
+variable "data_3_path" {
+  description = "Path for the file 3"
+}
+variable "data_1_name" {
+  description = "Name for the file 1"
+}
+variable "data_2_name" {
+  description = "Name for the file 2"
+}
+variable "data_3_name" {
+  description = "Name for the file 3"
+}

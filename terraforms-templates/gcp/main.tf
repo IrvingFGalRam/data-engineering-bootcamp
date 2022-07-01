@@ -41,4 +41,10 @@ module "cloudsql" {
   database_name     = var.database_name
   db_username       = var.db_username
   db_password       = var.db_password
+  data_1_path       = var.data_1_path
+  data_2_path       = var.data_2_path
+  data_3_path       = var.data_3_path
+  data_1_name       = var.data_1_name
+  data_2_name       = var.data_2_name
+  data_3_name       = var.data_3_name
 }
