@@ -1,3 +1,7 @@
+variable "project_id" {
+  description = "GCloud Project ID"
+}
+
 variable "region" {
   description = "Region where the instance will live"
 }

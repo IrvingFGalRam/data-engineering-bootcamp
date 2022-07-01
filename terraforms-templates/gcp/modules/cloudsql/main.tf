@@ -25,11 +25,13 @@ resource "google_sql_database_instance" "sql_instance" {
 resource "google_sql_database" "database" {
   name     = var.database_name
   instance = google_sql_database_instance.sql_instance.name
+//  instance = var.instance_name
 }
 
 resource "google_sql_user" "users" {
   name     = var.db_username
   instance = google_sql_database_instance.sql_instance.name
+//  instance = var.instance_name
   host     = "*"
   password = var.db_password
 }

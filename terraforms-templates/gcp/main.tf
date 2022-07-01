@@ -31,6 +31,7 @@ module "gke" {
 module "cloudsql" {
   source = "./modules/cloudsql"
 
+  project_id        = var.project_id
   region            = var.region
   location          = var.location
   instance_name     = var.instance_name
