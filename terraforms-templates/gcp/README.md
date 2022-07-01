@@ -13,16 +13,19 @@
 ## Step by step guide
 1. Clone this repository. And navigate to `gcp/`
 
-
 2. Create a [virtual environment for your local project](https://medium.com/@dakota.lillie/an-introduction-to-virtual-environments-in-python-ce16cda92853)
 and activate it:
     ```bash
-    python -m venv .venv # create virtual environment
-    # if you get [WinError 2] on Windows check https://stackoverflow.com/questions/61669873/python-venv-env-fails-winerror-2-the-system-cannot-find-the-file-specified
+    python3 -m venv .venv # create virtual environment
+    source .venv/bin/activate # activate virtual environment
+    deactivate # DO NOT RUN YET: deactivates virtual environment
+    
+    # Windows PS
+    python -m venv .venv # Using Python3 as our default, check this https://stackoverflow.com/a/64585018
     .\.venv\Scripts\activate # activate virtual environment
     deactivate # DO NOT RUN YET: deactivates virtual environment
+ 
     ```
-
 
 3. Initialize gcloud SDK and authorize it to access GCP using your user account credentials:
     ```bash
@@ -40,17 +43,14 @@ and activate it:
 will also ask you to choose a region to connect to. The information shown above in is an example of what you *can*
 choose, but keep in mind that this was used for credentials that were already entered once before.
 
-
-7. In the GCP Console, enable:
+4. In the GCP Console, enable:
    - Compute Engine API
    - Kubernetes Engine API
 
-
-8. In your cloned local project, copy the [terraform.tfvars.example](./terraform.tfvars.example) and paste it in the
+5. In your cloned local project, copy the [terraform.tfvars.example](./terraform.tfvars.example) and paste it in the
 root of the project named as *terraform.tfvars*, changing the property *project_id* to your corresponding project ID.
 
-
-9. Initialize the Terraform workspace and create the resources:
+6. Initialize the Terraform workspace and create the resources:
     ```bash
     terraform init # initialize
     terraform init --upgrade # if you initialized once before and need to update terraform config
@@ -60,60 +60,61 @@ root of the project named as *terraform.tfvars*, changing the property *project_
     ```
     ***IMPORTANT***: This process might take around 10-15 minutes, **be patient please**.
 
-
-10. Set the kubectl context:
+7. Set the kubectl context:
     ```bash
     gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw location)
     ```
 
-11. To work with Airflow, create a NFS (Network File System) server:
-     ```bash
-     kubectl create namespace nfs # creates namespace
-     kubectl -n nfs apply -f nfs/nfs-server.yaml # creates server
-     export NFS_SERVER=$(kubectl -n nfs get service/nfs-server -o jsonpath="{.spec.clusterIP}")
-     # On Windows PowerShell
-     $env:NFS_SERVER=$(kubectl -n nfs get service/nfs-server -o jsonpath="{.spec.clusterIP}")
-     # didn´t work set NFS_SERVER=$(kubectl -n nfs get service/nfs-server -o jsonpath="{.spec.clusterIP}") 
+8. To work with Airflow, create a NFS (Network File System) server:
+    ```bash
+    kubectl create namespace nfs # creates namespace
+    kubectl -n nfs apply -f nfs/nfs-server.yaml # creates server
+    export NFS_SERVER=$(kubectl -n nfs get service/nfs-server -o jsonpath="{.spec.clusterIP}")
+    $env:NFS_SERVER=$(kubectl -n nfs get service/nfs-server -o jsonpath="{.spec.clusterIP}") # On Windows PS
      ```
 
-12. Create a namespace for storage deployment:
-     ```bash
-     kubectl create namespace storage
-     ```
+9. Create a namespace for storage deployment:
+    ```bash
+    kubectl create namespace storage
+    ```
 
-13. Add the chart for the nfs-provisioner:
+10. Add the chart for the nfs-provisioner:
      ```bash
      helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
      ```
 
-14. Install nfs-external-provisioner:
+11. Install nfs-external-provisioner:
      ```bash
+     helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+    --namespace storage \
+    --set nfs.server=$NFS_SERVER \
+    --set nfs.path=/
+    # On Windows PS
      helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --namespace storage --set nfs.server=$env:NFS_SERVER --set nfs.path=/
      ```
 
-15. Create a namespace for Airflow:
+12. Create a namespace for Airflow:
     ```bash
     kubectl create namespace airflow
     ```
 
-16. Add the chart repository:
+13. Add the chart repository:
     ```bash
     helm repo add apache-airflow https://airflow.apache.org
     ```
 
-17. Install the Airflow chart from the repository:
+14. Install the Airflow chart from the repository:
     ```bash
     helm upgrade --install airflow -f airflow-values.yaml apache-airflow/airflow --namespace airflow
     ```
     ***IMPORTANT***: This process might take around 5 minutes to execute, **be patient please**.
 
-
-18. Verify that the pods are up and running:
+15. Verify that the pods are up and running:
     ```bash
     kubectl get pods -n airflow
     ```
 
-19. Access the Airflow dashboard with what the Helm chart provided:
+16. Access the Airflow dashboard with what the Helm chart provided:
     ```bash
     Your release is named airflow.
     You can now access your dashboard(s) by executing the following command(s) and visiting the corresponding port at localhost in your browser:
@@ -129,16 +130,13 @@ root of the project named as *terraform.tfvars*, changing the property *project_
     ```
     **Note:** Sometimes there's an error when doing the kubectl portforward. If all of the pods are running, we might
     just need to keep trying.
-    
 
-20. Once in `localhost:8080`, you should see the Airflow login.
+17. Once in `localhost:8080`, you should see the Airflow login.
 ![Airflow Login](./imgs/airflow-login.png "Airflow Login")
 
-
-21. After logging in with your credentials (username and password from webserver in step 18), you should see the Airflow
+18. After logging in with your credentials (username and password from webserver in step 18), you should see the Airflow
 dashboard.
 ![Airflow Dashboard](./imgs/airflow-dag-dashboard.png "Airflow Dashboard")
-
 
 ## Don't forget to ***destroy everything*** after you're done using it!
 - To destroy the cluster:
@@ -184,13 +182,11 @@ differently:
     ***Fix:*** In [terraform.tfvars](./terraform.tfvars) the value of the property *project_id* might need to be changed
 to match your project ID.
 
-
 4. 403: Not Authorized.
     > Error: Error, failed to create instance data-bootcamp: googleapi: Error 403: The client is not authorized to make
    > this request., notAuthorized
    
     ***Fix:*** You might've skipped the `gcloud auth application-default login` command to authorize access.
-
 
 5. Failed apache-airflow installation.
     > Error: INSTALLATION FAILED: failed to download "apache-airflow/airflow"
