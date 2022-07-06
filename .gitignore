@@ -4,7 +4,7 @@
 # Local .venv directories
 **/.venv/*
 
-# Local .data for data
-data/*
+# Local directory for data
+**/data/*
 
 .DS_Store

@@ -23,8 +23,12 @@ resource "google_storage_bucket_object" "data_3" {
 }
 
 # DB
+resource "random_id" "db_name_suffix" {
+  byte_length = 4
+}
+
 resource "google_sql_database_instance" "sql_instance" {
-  name              = var.instance_name
+  name              = "${var.instance_name}-${random_id.db_name_suffix.hex}"
   database_version  = var.database_version
   region            = var.region
 
