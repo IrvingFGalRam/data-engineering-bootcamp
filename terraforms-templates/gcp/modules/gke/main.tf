@@ -26,6 +26,8 @@ resource "google_container_node_pool" "primary_nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
 
+
+
     labels = {
       env = var.project_id
     }
@@ -36,5 +38,10 @@ resource "google_container_node_pool" "primary_nodes" {
     metadata = {
       disable-legacy-endpoints = "true"
     }
+  }
+
+  timeouts {
+    create = "20m"
+    update = "20m"
   }
 }
